@@ -4,18 +4,37 @@ const clockHandHour = document.querySelector(".clock-hand-hour");
 const clockHandMinute = document.querySelector(".clock-hand-minute");
 const clockHandSecond = document.querySelector(".clock-hand-second");
 
+const startDate = new Date(2022, 6, 13, 7, 15) // the real time we're waking up on the first day (note that January is 0, not 1)
+const fakeStartDate = new Date(2022, 6, 13, 7, 45) // the time we pretend to wake up on the first day (note that January is 0, not 1)
+const endDate = new Date(2022, 6, 14, 22, 0) // the real time we end the last day (note that January is 0, not 1)
+const fakeEndDate = new Date(2022, 6, 14, 22, 0) // the time we pretend to end the last day (note that January is 0, not 1)
+const fakeDays = 1 // days we add (if we put 3 days in 2 actual ones, we add 1 day)
+const rate = (endDate.getTime() - startDate.getTime()) / ((fakeEndDate.getTime() - fakeStartDate.getTime()) + fakeDays * 24 * 60 * 60 * 1000)
+
 let seconds = 0
 let minutes = 0
 let hours = 0
 let turnsSeconds = 0
 let turnsMinutes = 0
 let turnsHours = 0
+let tickSpeed = 1000
 
 function updateTime() {
     const date = new Date()
-    seconds = date.getSeconds()
-    minutes = date.getMinutes()
-    hours = date.getHours()
+    if (startDate < date && date < endDate) {
+        tickSpeed = rate * 1000
+        const delta = date.getTime() - startDate.getTime()
+        const fakeTime = fakeStartDate.getTime() + (delta / rate)
+        const fakeDate = new Date(fakeTime)
+        seconds = fakeDate.getSeconds()
+        minutes = fakeDate.getMinutes()
+        hours = fakeDate.getHours()
+    } else {
+        seconds = date.getSeconds()
+        minutes = date.getMinutes()
+        hours = date.getHours()
+        tickSpeed = 1000
+    }
 }
 
 function updateHand(hand, angle, turns) {
@@ -63,4 +82,4 @@ setTimeout(() => {
 
 setInterval(() => {
     tick()
-}, 1000)// * 155 / 249);
+}, tickSpeed)
