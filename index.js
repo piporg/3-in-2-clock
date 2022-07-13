@@ -5,28 +5,20 @@ const clockHandMinute = document.querySelector(".clock-hand-minute");
 const clockHandSecond = document.querySelector(".clock-hand-second");
 
 const date = new Date()
-console.log(date.getTime());
-console.log(date.getSeconds())
-console.log(date.getMinutes())
-console.log(date.getHours())
-
-let rotationSecond = 0
-let rotationMinute = 0
-let rotationHour = 0
 let seconds = date.getSeconds()
 let minutes = date.getMinutes()
 let hours = date.getHours()
+let turnsSeconds = 0
+let turnsMinutes = 0
+let turnsHours = 0
 
-function updateClockHM() {
-    rotationMinute = 360 / 60 * minutes;
-    clockHandMinute.style.transform = "translate(-50%, -50%) rotate(" + rotationMinute + "deg)"
-    rotationHour = 360 / 12 * hours + 360 / 12 / 60 * minutes;
-    clockHandHour.style.transform = "translate(-50%, -50%) rotate(" + rotationHour + "deg)"
-}
-
-function updateClockS() {
-    rotationSecond = 360 / 60 * seconds
-    clockHandSecond.style.transform = "translate(-50%, -50%) rotate(" + rotationSecond + "deg)";
+function updateHand(hand, angle, turns) {
+    if (angle === 0) {
+        turns += 1
+    }
+    const newAngle = (turns * 360) + angle
+    hand.style.transform = "translate(-50%, -50%) rotate(" + newAngle + "deg)";
+    return turns
 }
 
 function setTransition(flag) {
@@ -42,22 +34,34 @@ function setTransition(flag) {
     }
 }
 
-setTransition(false);
-updateClockHM();
-updateClockS();
-setTimeout(() => {
-    setTransition(true);
-}, 10);
-
-setInterval(() => {
+function tick() {
     if (seconds === 60) {
         seconds = 0
         minutes += 1
         if (minutes === 60) {
             minutes = 0;
+            hours += 1
+            if (hours === 12) {
+                hours = 0
+            }
         }
-        updateClockHM();
     }
+    if (seconds === 1) {
+        turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
+        turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
+    }
+    turnsSeconds = updateHand(clockHandSecond, 360 / 60 * seconds, turnsSeconds);
     seconds += 1
-    updateClockS();
+}
+
+setTransition(false);
+turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
+turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
+tick()
+setTimeout(() => {
+    setTransition(true);
+}, 10);
+
+setInterval(() => {
+    tick()
 }, 1000)// * 155 / 249);
