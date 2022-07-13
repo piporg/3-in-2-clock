@@ -4,13 +4,19 @@ const clockHandHour = document.querySelector(".clock-hand-hour");
 const clockHandMinute = document.querySelector(".clock-hand-minute");
 const clockHandSecond = document.querySelector(".clock-hand-second");
 
-const date = new Date()
-let seconds = date.getSeconds()
-let minutes = date.getMinutes()
-let hours = date.getHours()
+let seconds = 0
+let minutes = 0
+let hours = 0
 let turnsSeconds = 0
 let turnsMinutes = 0
 let turnsHours = 0
+
+function updateTime() {
+    const date = new Date()
+    seconds = date.getSeconds()
+    minutes = date.getMinutes()
+    hours = date.getHours()
+}
 
 function updateHand(hand, angle, turns) {
     if (angle === 0) {
@@ -36,15 +42,7 @@ function setTransition(flag) {
 
 function tick() {
     if (seconds === 60) {
-        seconds = 0
-        minutes += 1
-        if (minutes === 60) {
-            minutes = 0;
-            hours += 1
-            if (hours === 12) {
-                hours = 0
-            }
-        }
+        updateTime()
     }
     if (seconds === 1) {
         turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
@@ -54,6 +52,7 @@ function tick() {
     seconds += 1
 }
 
+updateTime()
 setTransition(false);
 turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
 turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
