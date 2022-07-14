@@ -9,8 +9,8 @@ const fakeStartDate = new Date(2022, 6, 13, 7, 45) // the time we pretend to wak
 const endDate = new Date(2022, 6, 14, 22, 0) // the real time we end the last day (note that January is 0, not 1)
 const fakeEndDate = new Date(2022, 6, 14, 22, 0) // the time we pretend to end the last day (note that January is 0, not 1)
 const fakeDays = 1 // days we add (if we put 3 days in 2 actual ones, we add 1 day)
-const rate = (endDate.getTime() - startDate.getTime()) / ((fakeEndDate.getTime() - fakeStartDate.getTime()) + fakeDays * 24 * 60 * 60 * 1000)
 
+const rate = (endDate.getTime() - startDate.getTime()) / ((fakeEndDate.getTime() - fakeStartDate.getTime()) + fakeDays * 24 * 60 * 60 * 1000)
 let seconds = 0
 let minutes = 0
 let hours = 0
@@ -22,7 +22,7 @@ let timer = null;
 
 function updateTime() {
     const date = new Date()
-    if (startDate < date && date < endDate) {
+    if (startDate.getTime() < date.getTime() && date.getTime() < endDate.getTime()) {
         if (tickSpeed != rate * 1000) {
             tickSpeed = rate * 1000
             stopTimer()
@@ -70,15 +70,16 @@ function setTransition(flag) {
 }
 
 function tick() {
+    seconds += 1
     if (seconds === 60) {
-        updateTime()
+        seconds = 0
     }
-    if (seconds === 1) {
+    else if (seconds === 1) {
+        updateTime()
         turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
         turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
     }
     turnsSeconds = updateHand(clockHandSecond, 360 / 60 * seconds, turnsSeconds);
-    seconds += 1
 }
 
 function stopTimer() {
@@ -92,7 +93,7 @@ function setHandPositions() {
     setTransition(false);
     turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
     turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
-    tick()
+    turnsSeconds = updateHand(clockHandSecond, 360 / 60 * seconds, turnsSeconds)
     setTimeout(() => {
         setTransition(true);
     }, 10);
