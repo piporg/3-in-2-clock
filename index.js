@@ -14,18 +14,24 @@ const rate = (endDate.getTime() - startDate.getTime()) / ((fakeEndDate.getTime()
 let seconds = 0
 let minutes = 0
 let hours = 0
-let turnsSeconds = 0
-let turnsMinutes = 0
-let turnsHours = 0
-let tickSpeed = 1000
+let angleSeconds = 0
+let angleMinutes = 0
+let angleHours = 0
+let tickSpeed = null;
 let timer = null;
 
 function updateTime() {
     const date = new Date()
     if (startDate.getTime() < date.getTime() && date.getTime() < endDate.getTime()) {
         if (tickSpeed != rate * 1000) {
-            tickSpeed = rate * 1000
-            stopTimer()
+            if (tickSpeed) {
+                stopTimer()
+                tickSpeed = rate * 1000
+                startTimer()
+            }
+            else {
+                tickSpeed = rate * 1000
+            }
         }
         const delta = date.getTime() - startDate.getTime()
         const fakeTime = fakeStartDate.getTime() + (delta / rate)
@@ -35,8 +41,14 @@ function updateTime() {
         hours = fakeDate.getHours()
     } else {
         if (tickSpeed != 1000) {
-            tickSpeed = 1000
-            stopTimer()
+            if (tickSpeed) {
+                stopTimer()
+                tickSpeed = 1000
+                startTimer()
+            }
+            else {
+                tickSpeed = 1000
+            }
         }
         seconds = date.getSeconds()
         minutes = date.getMinutes()
@@ -44,16 +56,15 @@ function updateTime() {
     }
     if (!timer) {
         setHandPositions()
+        startTimer()
     }
 }
 
-function updateHand(hand, angle, turns) {
-    if (angle === 0) {
-        turns += 1
-    }
-    const newAngle = (turns * 360) + angle
+function updateHand(hand, tickNo, tickCnt, angleTotal) {
+    const turns = Math.floor((angleTotal + 360 / tickCnt) / 360)
+    const newAngle = (turns * 360) + (tickNo * 360 / tickCnt)
     hand.style.transform = "translate(-50%, -50%) rotate(" + newAngle + "deg)";
-    return turns
+    return newAngle
 }
 
 function setTransition(flag) {
@@ -76,10 +87,10 @@ function tick() {
     }
     else if (seconds === 1) {
         updateTime()
-        turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
-        turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
+        angleHours = updateHand(clockHandHour, 60 * hours + minutes, 12 * 60, angleHours)
+        angleMinutes = updateHand(clockHandMinute, minutes, 60, angleMinutes)
     }
-    turnsSeconds = updateHand(clockHandSecond, 360 / 60 * seconds, turnsSeconds);
+    angleSeconds = updateHand(clockHandSecond, seconds, 60, angleSeconds);
 }
 
 function stopTimer() {
@@ -89,18 +100,20 @@ function stopTimer() {
     }
 }
 
-function setHandPositions() {
-    setTransition(false);
-    turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
-    turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
-    turnsSeconds = updateHand(clockHandSecond, 360 / 60 * seconds, turnsSeconds)
-    setTimeout(() => {
-        setTransition(true);
-    }, 10);
-
+function startTimer() {
     timer = setInterval(() => {
         tick()
     }, tickSpeed)
+}
+
+function setHandPositions() {
+    setTransition(false);
+    angleHours = updateHand(clockHandHour, 60 * hours + minutes, 12 * 60, angleHours)
+    angleMinutes = updateHand(clockHandMinute, minutes, 60, angleMinutes)
+    angleSeconds = updateHand(clockHandSecond, seconds, 60, angleSeconds);
+    setTimeout(() => {
+        setTransition(true);
+    }, 10);
 }
 
 document.addEventListener('visibilitychange', () => {
