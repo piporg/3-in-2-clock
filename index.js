@@ -4,10 +4,10 @@ const clockHandHour = document.querySelector(".clock-hand-hour");
 const clockHandMinute = document.querySelector(".clock-hand-minute");
 const clockHandSecond = document.querySelector(".clock-hand-second");
 
-const startDate = new Date(2022, 6, 13, 7, 15) // the real time we're waking up on the first day (note that January is 0, not 1)
-const fakeStartDate = new Date(2022, 6, 13, 7, 45) // the time we pretend to wake up on the first day (note that January is 0, not 1)
-const endDate = new Date(2022, 6, 14, 22, 0) // the real time we end the last day (note that January is 0, not 1)
-const fakeEndDate = new Date(2022, 6, 14, 22, 0) // the time we pretend to end the last day (note that January is 0, not 1)
+const startDate = new Date(2022, 6, 15, 7, 15) // the real time we're waking up on the first day (note that January is 0, not 1)
+const fakeStartDate = new Date(2022, 6, 15, 7, 45) // the time we pretend to wake up on the first day (note that January is 0, not 1)
+const endDate = new Date(2022, 6, 16, 22, 0) // the real time we end the last day (note that January is 0, not 1)
+const fakeEndDate = new Date(2022, 6, 16, 22, 0) // the time we pretend to end the last day (note that January is 0, not 1)
 const fakeDays = 1 // days we add (if we put 3 days in 2 actual ones, we add 1 day)
 
 const rate = (endDate.getTime() - startDate.getTime()) / ((fakeEndDate.getTime() - fakeStartDate.getTime()) + fakeDays * 24 * 60 * 60 * 1000)
