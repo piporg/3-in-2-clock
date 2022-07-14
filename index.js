@@ -23,7 +23,10 @@ let timer = null;
 function updateTime() {
     const date = new Date()
     if (startDate < date && date < endDate) {
-        tickSpeed = rate * 1000
+        if (tickSpeed != rate * 1000) {
+            tickSpeed = rate * 1000
+            stopTimer()
+        }
         const delta = date.getTime() - startDate.getTime()
         const fakeTime = fakeStartDate.getTime() + (delta / rate)
         const fakeDate = new Date(fakeTime)
@@ -31,10 +34,16 @@ function updateTime() {
         minutes = fakeDate.getMinutes()
         hours = fakeDate.getHours()
     } else {
+        if (tickSpeed != 1000) {
+            tickSpeed = 1000
+            stopTimer()
+        }
         seconds = date.getSeconds()
         minutes = date.getMinutes()
         hours = date.getHours()
-        tickSpeed = 1000
+    }
+    if (!timer) {
+        setHandPositions()
     }
 }
 
@@ -72,8 +81,14 @@ function tick() {
     seconds += 1
 }
 
-function init() {
-    updateTime()
+function stopTimer() {
+    if (timer) {
+        clearInterval(timer)
+        timer = null
+    }
+}
+
+function setHandPositions() {
     setTransition(false);
     turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
     turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
@@ -88,13 +103,11 @@ function init() {
 }
 
 document.addEventListener('visibilitychange', () => {
-    if (timer) {
-        clearInterval(timer)
-        timer = null
-    }
-    if (!document.hidden) {
-        init()
+    if (document.hidden) {
+        stopTimer()
+    } else {
+        updateTime()
     }
 })
 
-init()
+updateTime()
