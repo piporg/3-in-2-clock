@@ -18,6 +18,7 @@ let turnsSeconds = 0
 let turnsMinutes = 0
 let turnsHours = 0
 let tickSpeed = 1000
+let timer = null;
 
 function updateTime() {
     const date = new Date()
@@ -71,15 +72,29 @@ function tick() {
     seconds += 1
 }
 
-updateTime()
-setTransition(false);
-turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
-turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
-tick()
-setTimeout(() => {
-    setTransition(true);
-}, 10);
-
-setInterval(() => {
+function init() {
+    updateTime()
+    setTransition(false);
+    turnsHours = updateHand(clockHandHour, 360 / 12 * hours + 360 / 12 / 60 * minutes, turnsHours)
+    turnsMinutes = updateHand(clockHandMinute, 360 / 60 * minutes, turnsMinutes)
     tick()
-}, tickSpeed)
+    setTimeout(() => {
+        setTransition(true);
+    }, 10);
+
+    timer = setInterval(() => {
+        tick()
+    }, tickSpeed)
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (timer) {
+        clearInterval(timer)
+        timer = null
+    }
+    if (!document.hidden) {
+        init()
+    }
+})
+
+init()
